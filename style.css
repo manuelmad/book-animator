@@ -1,0 +1,284 @@
+:root {
+    /* Color World: Library & Archive */
+    --parchment: #f5f1e9;
+    --ink: #2d2d2d;
+    --ink-secondary: #4a4a4a;
+    --vellum: #d4af37;
+    --mahogany: #4a2c2a;
+    --paper-shadow: rgba(0, 0, 0, 0.1);
+    --hinge-shadow: rgba(0, 0, 0, 0.2);
+
+    /* Spacing */
+    --unit: 8px;
+
+    /* Elevation */
+    --bg-base: #e8e2d2;
+    --surface-desk: #3d2422;
+    /* Rich mahogany desk */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+body {
+    background-color: var(--bg-base);
+    color: var(--ink);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image:
+        radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.05) 0%, transparent 80%),
+        url("https://www.transparenttextures.com/patterns/pinstriped-suit.png");
+    /* Subtle texture */
+}
+
+/* Header & Layout */
+header {
+    width: 100%;
+    padding: calc(var(--unit) * 4);
+    text-align: center;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--mahogany);
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    margin-bottom: var(--unit);
+}
+
+.subtitle {
+    color: var(--ink-secondary);
+    font-size: 0.9rem;
+    text-transform: italic;
+}
+
+/* Main Workspace */
+main {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--unit) * 6);
+    padding: calc(var(--unit) * 4);
+}
+
+/* Upload Zone */
+.upload-container {
+    width: 100%;
+    max-width: 600px;
+    background: var(--parchment);
+    border: 2px dashed var(--mahogany);
+    border-radius: 12px;
+    padding: calc(var(--unit) * 6);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px var(--paper-shadow);
+}
+
+.upload-container:hover {
+    border-color: var(--vellum);
+    background: #fff;
+    transform: translateY(-2px);
+}
+
+.upload-icon {
+    font-size: 2rem;
+    margin-bottom: var(--unit);
+    display: block;
+}
+
+/* Progress Bar */
+.progress-wrapper {
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    margin-top: calc(var(--unit) * 2);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--paper-shadow);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: var(--unit);
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--mahogany);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(74, 44, 42, 0.3);
+}
+
+#progress-text {
+    font-size: 0.85rem;
+    color: var(--ink-secondary);
+    font-weight: 500;
+}
+
+/* Controls */
+
+.controls {
+    display: flex;
+    gap: calc(var(--unit) * 2);
+}
+
+button {
+    background: var(--mahogany);
+    color: var(--parchment);
+    border: none;
+    padding: calc(var(--unit) * 1.5) calc(var(--unit) * 4);
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+    background: #5d3a38;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Book Viewer Area */
+#viewer {
+    width: 100%;
+    height: 600px;
+    perspective: 1500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--surface-desk);
+    border-radius: 16px;
+    box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.5), 0 20px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    display: none;
+    /* Shown after upload */
+}
+
+/* Book Structure */
+.book {
+    width: 400px;
+    height: 550px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s;
+    transform: translateX(50%);
+    /* Shifts left edge to center */
+}
+
+
+.page {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform-origin: left center;
+    transition: transform 1.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.page.flipped {
+    transform: rotateY(-180deg);
+}
+
+.page-front,
+.page-back {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    backface-visibility: hidden;
+    background: var(--parchment);
+    box-shadow: inset 3px 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.page-back {
+    transform: rotateY(180deg);
+}
+
+/* Lighting effect during flip */
+.page-front::before,
+.page-back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.75s;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.page.flipped .page-front::before {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.page.flipped .page-back::before {
+    background: rgba(0, 0, 0, 0);
+}
+
+.page-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    background: white;
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Shadow Hinge Signature */
+.page-front::after,
+.page-back::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.page-front::after {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.15), transparent);
+}
+
+.page-back::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.15), transparent);
+}

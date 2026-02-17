@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Animator | El Archivo Vivo</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- pdf.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>Book Animator</h1>
+        <p class="subtitle">Tus documentos, convertidos en historia viva.</p>
+    </header>
+
+    <main>
+        <div id="drop-zone" class="upload-container">
+            <span class="upload-icon">📜</span>
+            <h3>Sube tu documento</h3>
+            <p>PDF, Word o PowerPoint</p>
+            <input type="file" id="file-input" hidden accept=".pdf">
+        </div>
+
+        <div id="progress-container" class="progress-wrapper" style="display: none;">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <p id="progress-text">Procesando páginas: 0%</p>
+        </div>
+
+        <div class="controls">
+
+            <button id="animate-btn" disabled>Animar Libro</button>
+            <button id="reset-btn" style="display: none;">Subir otro</button>
+        </div>
+
+        <div id="viewer">
+            <!-- Book will be generated here -->
+            <div id="book-container" class="book"></div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
