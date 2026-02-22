@@ -160,7 +160,9 @@ button:disabled {
 /* Book Viewer Area */
 #viewer {
     width: 100%;
-    height: 600px;
+    aspect-ratio: 16 / 10;
+    max-height: 80vh;
+    /* min-height: 300px; */
     perspective: 1500px;
     display: flex;
     justify-content: center;
@@ -176,8 +178,9 @@ button:disabled {
 
 /* Book Structure */
 .book {
-    width: 400px;
-    height: 550px;
+    height: 85%;
+    max-width: 45%;
+    aspect-ratio: 400 / 550;
     position: relative;
     transform-style: preserve-3d;
     transition: transform 0.5s;
