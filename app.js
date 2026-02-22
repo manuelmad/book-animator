@@ -14,6 +14,7 @@ const progressText = document.getElementById('progress-text');
 
 let pdfDoc = null;
 let isAnimating = false;
+let currentAnimationInterval = null;
 
 // Event Listeners
 dropZone.addEventListener('click', () => fileInput.click());
@@ -34,7 +35,7 @@ dropZone.addEventListener('drop', (e) => {
     if (files.length > 0) handleFile(files[0]);
 });
 
-animateBtn.addEventListener('click', startAnimation);
+animateBtn.addEventListener('click', handleAnimateClick);
 resetBtn.addEventListener('click', resetApp);
 
 async function handleFileSelect(e) {
@@ -149,15 +150,68 @@ async function renderPageToCanvas(pageIndex, targetWidth, targetHeight) {
     return contentDiv;
 }
 
-async function startAnimation() {
-    if (isAnimating) return;
+async function handleAnimateClick() {
+    if (isAnimating) {
+        // Stop current animation if any
+        if (currentAnimationInterval) {
+            clearInterval(currentAnimationInterval);
+            currentAnimationInterval = null;
+        }
+        await rewindBook();
+    } else {
+        const flippedSheets = document.querySelectorAll('.page.flipped');
+        if (flippedSheets.length > 0) {
+            await rewindBook();
+        }
+    }
+
+    startAnimation();
+}
+
+async function rewindBook() {
     isAnimating = true;
     animateBtn.disabled = true;
+
+    const sheets = Array.from(document.querySelectorAll('.page')).reverse();
+    const totalSheets = sheets.length;
+
+    // Add fast rewind style to all sheets
+    sheets.forEach(sheet => sheet.classList.add('fast-rewind'));
+
+    for (let i = 0; i < sheets.length; i++) {
+        const sheet = sheets[i];
+        if (sheet.classList.contains('flipped')) {
+            sheet.classList.remove('flipped');
+            // Reset zIndex immediately to avoid stacking issues during rewind
+            const sheetIndex = totalSheets - 1 - i;
+            sheet.style.zIndex = totalSheets - sheetIndex;
+
+            // Wait a small bit between pages to create the "flipping back" effect
+            await new Promise(r => setTimeout(r, 100));
+        }
+    }
+
+    // Wait for the last sheet's transition to finish
+    await new Promise(r => setTimeout(r, 400));
+
+    // Cleanup classes
+    sheets.forEach(sheet => sheet.classList.remove('fast-rewind'));
+
+    isAnimating = false;
+    animateBtn.disabled = false;
+}
+
+function startAnimation() {
+    if (isAnimating) return;
+    isAnimating = true;
+    // We don't disable the button here anymore, to allow restart
+    // But we might want to change its text
+    animateBtn.innerText = "Reiniciar Animación";
 
     const sheets = document.querySelectorAll('.page');
     let currentSheet = 0;
 
-    const interval = setInterval(() => {
+    currentAnimationInterval = setInterval(() => {
         if (currentSheet < sheets.length) {
             const sheet = sheets[currentSheet];
             sheet.classList.add('flipped');
@@ -169,14 +223,20 @@ async function startAnimation() {
 
             currentSheet++;
         } else {
-            clearInterval(interval);
+            clearInterval(currentAnimationInterval);
+            currentAnimationInterval = null;
             isAnimating = false;
+            animateBtn.innerText = "Animar Libro";
         }
     }, 2000);
 }
 
 
 function resetApp() {
+    if (currentAnimationInterval) {
+        clearInterval(currentAnimationInterval);
+        currentAnimationInterval = null;
+    }
     pdfDoc = null;
     isAnimating = false;
     dropZone.style.display = 'block';
@@ -184,6 +244,7 @@ function resetApp() {
     progressContainer.style.display = 'none';
     progressFill.style.width = '0%';
     animateBtn.disabled = true;
+    animateBtn.innerText = "Animar Libro";
     resetBtn.style.display = 'none';
     bookContainer.innerHTML = '';
 }
